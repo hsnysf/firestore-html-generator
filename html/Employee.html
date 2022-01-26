@@ -237,9 +237,6 @@
 									Active
 								</th>
 								<th>
-									Last Update
-								</th>
-								<th>
 									<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#employeeModal" ng-click="toAddEmployee()">Add</button>
 								</th>
 							</tr>
@@ -293,9 +290,6 @@
 								</td>
 								<td>
 									{{employee.active ? 'Yes' : 'No'}}
-								</td>
-								<td>
-									{{employee.time}}
 								</td>
 								<th>
 									<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#viewModal" ng-click="selectEmployee(employee)">View</button>
@@ -659,17 +653,10 @@
 					$scope.alert = {class:"d-none", message:null};
 					$scope.employees = new Array();
 					$scope.employeeSearch = new Object();
-					//$scope.employeeSearch.active = true;
+					$scope.employeeSearch.active = true;
 					$scope.employee = new Object();
-					$scope.employee.certificates = new Array();
 					
-					$(".date-picker").datetimepicker({
-						minView: 2,
-						maxView: 2,
-						format: "dd-mm-yyyy",
-						autoclose: true,
-						todayBtn: true,
-					});
+					$scope.employee.certificates = new Array();
 					
 					firebase.firestore().collection("employees").orderBy("id", "desc").limit(1).onSnapshot(function(snapshot) {
 						
@@ -704,7 +691,7 @@
 						if($scope.time != null 
 							&& $scope.time != ""){
 							
-							//employeesRef = employeesRef.where("time", ">=", $scope.time);
+							employeesRef = employeesRef.where("time", ">=", $scope.time);
 						}
 						
 						if($scope.limit != null 
@@ -773,6 +760,10 @@
 								$scope.searchEmployees(false);
 								
 								$scope.$digest();
+							
+							}).catch(function(error){
+								
+								$scope.alert = {class:"alert-danger", message:result};
 							});
 							
 						}else{
@@ -819,6 +810,10 @@
 								$scope.searchEmployees(false);
 								
 								$scope.$digest();
+							
+							}).catch(function(error){
+								
+								$scope.alert = {class:"alert-danger", message:result};
 							});
 							
 						}else{
@@ -831,10 +826,10 @@
 						
 						window.scrollTo(0, 0);
 						
+						$scope.alert = {class:"alert-warning", message:"Please wait"};
+						
 						$scope.employee.active = !$scope.employee.active;
 						$scope.employee.time = getTime();
-						
-						$scope.alert = {class:"alert-warning", message:"Please wait"};
 						
 						firebase.firestore().collection("employees").doc(String($scope.employee.id)).set($scope.employee).then(function(reference){
 							
@@ -850,6 +845,10 @@
 							$scope.searchEmployees(false);
 							
 							$scope.$digest();
+							
+						}).catch(function(error){
+							
+							$scope.alert = {class:"alert-danger", message:result};
 						});
 					}
 					

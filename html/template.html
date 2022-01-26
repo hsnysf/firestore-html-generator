@@ -116,9 +116,6 @@
 								</th>
 								#end
 								<th>
-									Last Update
-								</th>
-								<th>
 									<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#${table.propertyName}Modal" ng-click="toAdd${table.className}()">Add</button>
 								</th>
 							</tr>
@@ -137,9 +134,6 @@
 									#end
 								</td>
 								#end
-								<td>
-									{{${table.propertyName}.time}}
-								</td>
 								<th>
 									<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#viewModal" ng-click="select${table.className}(${table.propertyName})">View</button>
 									<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#${table.propertyName}Modal" ng-click="toUpdate${table.className}(${table.propertyName})">Edit</button>
@@ -354,7 +348,7 @@
 
 				function(#[[$scope, $timeout]]#){
 					
-					#[[$scope]]#.employeesLoading = true;
+					#[[$scope]]#.${table.propertyName}sLoading = true;
 					#[[$scope]]#.max${table.className}Id = 0;
 					#[[$scope]]#.limit = 50;
 					#[[$scope]]#.time = getLastMonthDate();
@@ -362,19 +356,12 @@
 					#[[$scope]]#.alert = {class:"d-none", message:null};
 					#[[$scope]]#.${table.propertyName}s = new Array();
 					#[[$scope]]#.${table.propertyName}Search = new Object();
-					//#[[$scope]]#.${table.propertyName}Search.active = true;
+					#[[$scope]]#.${table.propertyName}Search.active = true;
 					#[[$scope]]#.${table.propertyName} = new Object();
+					
 					#foreach(${exportedKey} in ${table.exportedKeys})
 					#[[$scope]]#.${table.propertyName}.${exportedKey.propertyName}s = new Array();
 					#end
-					
-					#[[$]]#(".date-picker").datetimepicker({
-						minView: 2,
-						maxView: 2,
-						format: "dd-mm-yyyy",
-						autoclose: true,
-						todayBtn: true,
-					});
 					
 					firebase.firestore().collection("${table.propertyName}s").orderBy("id", "desc").limit(1).onSnapshot(function(snapshot) {
 						
@@ -382,12 +369,12 @@
 							
 							if (change.type === "added") {
 								
-								$scope.max${table.className}Id = Number(change.doc.id);
+								#[[$scope]]#.max${table.className}Id = Number(change.doc.id);
 							}
 						});
 					});
 					
-					$scope.search${table.className}s = function(alert){
+					#[[$scope]]#.search${table.className}s = function(alert){
 						
 						#[[$scope]]#.${table.propertyName}s = new Array();
 						
@@ -395,7 +382,7 @@
 						
 						var ${table.propertyName}sRef = firebase.firestore().collection("${table.propertyName}s");
 						
-						var properties = getProperties($scope.${table.propertyName}Search, "");
+						var properties = getProperties(#[[$scope]]#.${table.propertyName}Search, "");
 						
 						for(let property in properties){
 							
@@ -409,7 +396,7 @@
 						if(#[[$scope]]#.time != null 
 							&& #[[$scope]]#.time != ""){
 							
-							//${table.propertyName}sRef = ${table.propertyName}sRef.where("time", ">=", #[[$scope]]#.time);
+							${table.propertyName}sRef = ${table.propertyName}sRef.where("time", ">=", #[[$scope]]#.time);
 						}
 						
 						if(#[[$scope]]#.limit != null 
@@ -473,13 +460,17 @@
 							#[[$scope]]#.${table.propertyName}.active = true;
 							#[[$scope]]#.${table.propertyName}.time = getTime();
 							
-							firebase.firestore().collection("${table.propertyName}s").doc(String($scope.${table.propertyName}.id)).set($scope.${table.propertyName}).then(function(reference){
+							firebase.firestore().collection("${table.propertyName}s").doc(String(#[[$scope]]#.${table.propertyName}.id)).set(#[[$scope]]#.${table.propertyName}).then(function(reference){
 								
 								#[[$scope]]#.alert = {class:"alert-success", message:"${table.title} with ID#" + #[[$scope]]#.${table.propertyName}.id + " has been added successfully"};
 								
 								#[[$scope]]#.search${table.className}s(false);
 								
 								#[[$scope]]#.$digest();
+							
+							}).catch(function(error){
+								
+								#[[$scope]]#.alert = {class:"alert-danger", message:result};
 							});
 							
 						}else{
@@ -521,13 +512,17 @@
 							
 							#[[$scope]]#.${table.propertyName}.time = getTime();
 							
-							firebase.firestore().collection("${table.propertyName}s").doc(String($scope.${table.propertyName}.id)).set($scope.${table.propertyName}).then(function(reference){
+							firebase.firestore().collection("${table.propertyName}s").doc(String(#[[$scope]]#.${table.propertyName}.id)).set(#[[$scope]]#.${table.propertyName}).then(function(reference){
 								
 								#[[$scope]]#.alert = {class:"alert-success", message:"${table.title} with ID#" + #[[$scope]]#.${table.propertyName}.id + " has been updated successfully"};
 								
 								#[[$scope]]#.search${table.className}s(false);
 								
 								#[[$scope]]#.$digest();
+							
+							}).catch(function(error){
+								
+								#[[$scope]]#.alert = {class:"alert-danger", message:result};
 							});
 							
 						}else{
@@ -540,12 +535,12 @@
 						
 						window.scrollTo(0, 0);
 						
+						#[[$scope]]#.alert = {class:"alert-warning", message:"Please wait"};
+						
 						#[[$scope]]#.${table.propertyName}.active = !#[[$scope]]#.${table.propertyName}.active;
 						#[[$scope]]#.${table.propertyName}.time = getTime();
 						
-						#[[$scope]]#.alert = {class:"alert-warning", message:"Please wait"};
-						
-						firebase.firestore().collection("${table.propertyName}s").doc(String($scope.${table.propertyName}.id)).set($scope.${table.propertyName}).then(function(reference){
+						firebase.firestore().collection("${table.propertyName}s").doc(String(#[[$scope]]#.${table.propertyName}.id)).set(#[[$scope]]#.${table.propertyName}).then(function(reference){
 							
 							if(#[[$scope]]#.${table.propertyName}.active){
 								
@@ -559,6 +554,10 @@
 							#[[$scope]]#.search${table.className}s(false);
 							
 							#[[$scope]]#.$digest();
+							
+						}).catch(function(error){
+							
+							#[[$scope]]#.alert = {class:"alert-danger", message:result};
 						});
 					}
 					

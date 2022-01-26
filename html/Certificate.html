@@ -277,9 +277,6 @@
 									Active
 								</th>
 								<th>
-									Last Update
-								</th>
-								<th>
 									<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#certificateModal" ng-click="toAddCertificate()">Add</button>
 								</th>
 							</tr>
@@ -345,9 +342,6 @@
 								</td>
 								<td>
 									{{certificate.active ? 'Yes' : 'No'}}
-								</td>
-								<td>
-									{{certificate.time}}
 								</td>
 								<th>
 									<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#viewModal" ng-click="selectCertificate(certificate)">View</button>
@@ -666,7 +660,7 @@
 
 				function($scope, $timeout){
 					
-					$scope.employeesLoading = true;
+					$scope.certificatesLoading = true;
 					$scope.maxCertificateId = 0;
 					$scope.limit = 50;
 					$scope.time = getLastMonthDate();
@@ -674,16 +668,9 @@
 					$scope.alert = {class:"d-none", message:null};
 					$scope.certificates = new Array();
 					$scope.certificateSearch = new Object();
-					//$scope.certificateSearch.active = true;
+					$scope.certificateSearch.active = true;
 					$scope.certificate = new Object();
 					
-					$(".date-picker").datetimepicker({
-						minView: 2,
-						maxView: 2,
-						format: "dd-mm-yyyy",
-						autoclose: true,
-						todayBtn: true,
-					});
 					
 					firebase.firestore().collection("certificates").orderBy("id", "desc").limit(1).onSnapshot(function(snapshot) {
 						
@@ -718,7 +705,7 @@
 						if($scope.time != null 
 							&& $scope.time != ""){
 							
-							//certificatesRef = certificatesRef.where("time", ">=", $scope.time);
+							certificatesRef = certificatesRef.where("time", ">=", $scope.time);
 						}
 						
 						if($scope.limit != null 
@@ -786,6 +773,10 @@
 								$scope.searchCertificates(false);
 								
 								$scope.$digest();
+							
+							}).catch(function(error){
+								
+								$scope.alert = {class:"alert-danger", message:result};
 							});
 							
 						}else{
@@ -828,6 +819,10 @@
 								$scope.searchCertificates(false);
 								
 								$scope.$digest();
+							
+							}).catch(function(error){
+								
+								$scope.alert = {class:"alert-danger", message:result};
 							});
 							
 						}else{
@@ -840,10 +835,10 @@
 						
 						window.scrollTo(0, 0);
 						
+						$scope.alert = {class:"alert-warning", message:"Please wait"};
+						
 						$scope.certificate.active = !$scope.certificate.active;
 						$scope.certificate.time = getTime();
-						
-						$scope.alert = {class:"alert-warning", message:"Please wait"};
 						
 						firebase.firestore().collection("certificates").doc(String($scope.certificate.id)).set($scope.certificate).then(function(reference){
 							
@@ -859,6 +854,10 @@
 							$scope.searchCertificates(false);
 							
 							$scope.$digest();
+							
+						}).catch(function(error){
+							
+							$scope.alert = {class:"alert-danger", message:result};
 						});
 					}
 					
