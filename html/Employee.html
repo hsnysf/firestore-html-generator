@@ -658,6 +658,14 @@
 					
 					$scope.employee.certificates = new Array();
 					
+					$(".date-picker").datetimepicker({
+						minView: 2,
+						maxView: 2,
+						format: "dd-mm-yyyy",
+						autoclose: true,
+						todayBtn: true,
+					});
+					
 					firebase.firestore().collection("employees").orderBy("id", "desc").limit(1).onSnapshot(function(snapshot) {
 						
 						snapshot.docChanges().forEach(function(change) {
