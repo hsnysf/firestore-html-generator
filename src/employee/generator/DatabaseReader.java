@@ -181,7 +181,7 @@ public class DatabaseReader {
 		//Get Primary Key Column for each table
 		for(Table table : tableMap.values()) {
 			
-			table.columnList = getAllColumns(table, null, "");
+			table.columnList = getAllColumns(table, relationColumn, propertyName);
 			
 			if(table.parentTable != null) {
 				
